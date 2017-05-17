@@ -53,6 +53,18 @@ public class GradeDAO {
 		return grade;
 	}
 	
+	public void edit(Grade grade, int id) throws Exception{
+		Connection connection = DBConfig.getConnection();
+		
+		String sql = "UPDATE GRADE SET TITLE=?, DESCRIPTION=? WHERE ID_GRADE = ?";
+		System.out.println(grade.getId() + grade.getTitle() + grade.getDescription());
+		PreparedStatement statement = connection.prepareStatement(sql);
+		statement.setString(1, grade.getTitle());
+		statement.setString(2, grade.getDescription());
+		statement.setInt(3, id);
+		statement.execute();
+	}
+	
 	public void addGrade(Grade grade) throws Exception{
 		Connection connection = DBConfig.getConnection();
 		
