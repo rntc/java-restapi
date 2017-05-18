@@ -1,5 +1,6 @@
 package com.rntc.entity;
 
+
 public class Grade {
 
 	private int id;

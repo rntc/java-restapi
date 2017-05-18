@@ -57,11 +57,21 @@ public class GradeDAO {
 		Connection connection = DBConfig.getConnection();
 		
 		String sql = "UPDATE GRADE SET TITLE=?, DESCRIPTION=? WHERE ID_GRADE = ?";
-		System.out.println(grade.getId() + grade.getTitle() + grade.getDescription());
+		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setString(1, grade.getTitle());
 		statement.setString(2, grade.getDescription());
 		statement.setInt(3, id);
+		statement.execute();
+	}
+	
+	public void delete(int id) throws Exception{
+		Connection connection = DBConfig.getConnection();
+		
+		String sql = "DELETE FROM GRADE WHERE ID_GRADE=?";
+		
+		PreparedStatement statement = connection.prepareStatement(sql);
+		statement.setInt(1, id);
 		statement.execute();
 	}
 	

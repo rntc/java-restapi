@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -88,5 +89,22 @@ public class GradeService {
 		return msg;
 	}
 	
+	@DELETE
+	@Path("/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
+	public String edit(@PathParam("id") int gradeId){
+		String msg = "";
+
+		try{
+			gradeDAO.delete(gradeId);
+			msg = "Grade deleted with success!";
+		}catch(Exception e){
+			msg = "Error trying to delete the grade!";
+			e.printStackTrace();
+		}
+		
+		return msg;
+	}
 	
 }
