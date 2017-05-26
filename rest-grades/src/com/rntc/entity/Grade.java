@@ -1,6 +1,12 @@
 package com.rntc.entity;
 
-
+/**
+ * This is class it's a POJO for Grade.
+ * 
+ * @author reis
+ * @version 1.0
+ * @since 5/21/2017
+ */
 public class Grade {
 
 	private int id;

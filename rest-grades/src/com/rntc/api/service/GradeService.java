@@ -1,4 +1,4 @@
-package com.rntc.api;
+package com.rntc.api.service;
 
 import java.util.List;
 
@@ -13,17 +13,24 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import com.rntc.api.dao.GradeDAO;
+import com.rntc.api.repository.GradeRepository;
 import com.rntc.entity.Grade;
+
+/**
+ * 
+ * @author reis
+ * @since 05/21/2017
+ *
+ */
 
 @Path("/grades")
 public class GradeService {
 
-	private GradeDAO gradeDAO;
+	private GradeRepository gradeRepository;
 
 	@PostConstruct
 	public void init() {
-		gradeDAO = new GradeDAO();
+		gradeRepository = new GradeRepository();
 	}
 
 	@GET
@@ -31,7 +38,7 @@ public class GradeService {
 	public List<Grade> listGrades() {
 		List<Grade> grades = null;
 		try {
-			grades = gradeDAO.listGrades();
+			grades = gradeRepository.listGrades();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -45,7 +52,7 @@ public class GradeService {
 		String msg = "";
 
 		try {
-			gradeDAO.addGrade(grade);
+			gradeRepository.addGrade(grade);
 			msg = "Grade saved with success!";
 		} catch (Exception e) {
 			msg = "Error trying to saving the grade";
@@ -63,7 +70,7 @@ public class GradeService {
 		Grade grade = null;
 		
 		try{
-			grade = gradeDAO.findById(gradeId);
+			grade = gradeRepository.findById(gradeId);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -79,7 +86,7 @@ public class GradeService {
 		String msg = "";
 
 		try{
-			gradeDAO.edit(grade, gradeId);
+			gradeRepository.edit(grade, gradeId);
 			msg = "Grade edited with success!";
 		}catch(Exception e){
 			msg = "Error trying to editing the grade!";
@@ -97,7 +104,7 @@ public class GradeService {
 		String msg = "";
 
 		try{
-			gradeDAO.delete(gradeId);
+			gradeRepository.delete(gradeId);
 			msg = "Grade deleted with success!";
 		}catch(Exception e){
 			msg = "Error trying to delete the grade!";
