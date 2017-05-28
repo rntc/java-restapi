@@ -5,12 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.rntc.api.exception.APIException;
 import com.rntc.config.DBConfig;
 import com.rntc.entity.Grade;
 
 /**
- * The class GradeRepository represents the database operations, such as: add,
- * edit, delete, findById.
+ * The class GradeRepository represents specific operation in the database.
  * 
  * @version 1.0
  * @author reis
@@ -18,116 +19,72 @@ import com.rntc.entity.Grade;
  */
 public class GradeRepository {
 
+	public static final int PAGE_LENGTH = 5;
+	
 	/**
-	 * This method returns a list of grades.
+	 * This method returns an offset of grades off the database. 
+	 * 
+	 * @param page This parameter represents the offset of the page 
+	 * @return List<Grade> Returns the list of grades from the database.
+	 * @throws APIException
+	 */
+	public List<Grade> getByRange(int page) throws APIException{
+		List<Grade> grades = new ArrayList<>();
+		
+		try{
+			Connection connection = DBConfig.getConnection();
+			
+			page = (page - 1) * PAGE_LENGTH;
+			String sql = "SELECT * FROM GRADE OFFSET ? LIMIT ?";
+			PreparedStatement statement = connection.prepareStatement(sql);
+			statement.setInt(1, page);
+			statement.setInt(2,  PAGE_LENGTH);
+			
+			ResultSet resultSet = statement.executeQuery();
+			
+			while(resultSet.next()){
+				Grade grade = new Grade(
+						resultSet.getInt("ID_GRADE"), 
+						resultSet.getString("TITLE"), 
+						resultSet.getString("DESCRIPTION"));
+				grades.add(grade);
+			}
+		}catch(Exception e){
+			throw new APIException(500, "Error trying to page the data of the database." + e.getMessage());
+		}
+		
+		return grades;
+	}
+
+	/**
+	 * This method returns a paged list of grades.
 	 * 
 	 * @return List<Grade> This returns a list of grades from the DB.
 	 * @throws Exception
+	 * 
 	 */
-	public List<Grade> listGrades() throws Exception {
+	public List<Grade> getAll() throws APIException {
 
 		List<Grade> grades = new ArrayList<>();
+		try {
+			Connection connection = DBConfig.getConnection();
+			String sql = "SELECT * FROM GRADE LIMIT " + PAGE_LENGTH;
 
-		Connection connection = DBConfig.getConnection();
-		String sql = "SELECT * FROM GRADE";
+			PreparedStatement statement = connection.prepareStatement(sql);
+			ResultSet resultSet = statement.executeQuery();
 
-		PreparedStatement statement = connection.prepareStatement(sql);
-		ResultSet resultSet = statement.executeQuery();
-
-		while (resultSet.next()) {
-			Grade grade = new Grade();
-			grade.setId(resultSet.getInt("ID_GRADE"));
-			grade.setTitle(resultSet.getString("TITLE"));
-			grade.setDescription(resultSet.getString("DESCRIPTION"));
-			grades.add(grade);
+			while (resultSet.next()) {
+				Grade grade = new Grade(
+						resultSet.getInt("ID_GRADE"), 
+						resultSet.getString("TITLE"),
+						resultSet.getString("DESCRIPTION"));
+				grades.add(grade);
+			}
+		} catch (Exception e) {
+			throw new APIException(500, "Error trying to find the data in the database." + e.getMessage());
 		}
 
 		return grades;
 
-	}
-
-	/**
-	 * This method is used to find a grade by id, and if find one returns the
-	 * Grade.
-	 * 
-	 * @param idGrade
-	 *            int That represents the id of the grade.
-	 * @return Grade The object grade.
-	 * @throws Exception
-	 */
-	public Grade findById(int idGrade) throws Exception {
-		Grade grade = null;
-
-		Connection connection = DBConfig.getConnection();
-
-		String sql = "SELECT * FROM GRADE WHERE ID_GRADE= ?";
-
-		PreparedStatement statement = connection.prepareStatement(sql);
-		statement.setInt(1, idGrade);
-		ResultSet resultSet = statement.executeQuery();
-
-		if (resultSet.next()) {
-			grade = new Grade();
-			grade.setId(resultSet.getInt("ID_GRADE"));
-			grade.setTitle(resultSet.getString("TITLE"));
-			grade.setDescription(resultSet.getString("DESCRIPTION"));
-		}
-
-		return grade;
-	}
-
-	/**
-	 * This method edit a grade by the given id.
-	 * 
-	 * @param grade
-	 *            The object grade.
-	 * @param id
-	 *            The id of the grade.
-	 * @throws Exception
-	 */
-	public void edit(Grade grade, int id) throws Exception {
-		Connection connection = DBConfig.getConnection();
-
-		String sql = "UPDATE GRADE SET TITLE=?, DESCRIPTION=? WHERE ID_GRADE = ?";
-
-		PreparedStatement statement = connection.prepareStatement(sql);
-		statement.setString(1, grade.getTitle());
-		statement.setString(2, grade.getDescription());
-		statement.setInt(3, id);
-		statement.execute();
-	}
-
-	/**
-	 * This method delete a grade by the given id.
-	 * 
-	 * @param id
-	 *            The grade id
-	 * @throws Exception
-	 */
-	public void delete(int id) throws Exception {
-		Connection connection = DBConfig.getConnection();
-
-		String sql = "DELETE FROM GRADE WHERE ID_GRADE=?";
-
-		PreparedStatement statement = connection.prepareStatement(sql);
-		statement.setInt(1, id);
-		statement.execute();
-	}
-
-	/**
-	 * This method add a grade
-	 * 
-	 * @param grade
-	 *            The grade object.
-	 * @throws Exception
-	 */
-	public void addGrade(Grade grade) throws Exception {
-		Connection connection = DBConfig.getConnection();
-
-		String sql = "INSERT INTO GRADE(TITLE, DESCRIPTION) VALUES(?,?)";
-		PreparedStatement statement = connection.prepareStatement(sql);
-		statement.setString(1, grade.getTitle());
-		statement.setString(2, grade.getDescription());
-		statement.execute();
 	}
 }
